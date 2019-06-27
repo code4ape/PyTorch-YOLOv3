@@ -236,15 +236,21 @@ def non_max_suppression(prediction, conf_thres=0.5, nms_thres=0.4):
     output = [None for _ in range(len(prediction))]
     for image_i, image_pred in enumerate(prediction):
         # Filter out confidence scores below threshold
+        
         image_pred = image_pred[image_pred[:, 4] >= conf_thres]
+        #print(image_pred[:, 5])
         # If none are remaining => process next image
         if not image_pred.size(0):
             continue
         # Object confidence times class confidence
+        #print(image_pred[:, 4])
+        #print(image_pred[:, 5])
         score = image_pred[:, 4] * image_pred[:, 5:].max(1)[0]
+        #print(score)
         # Sort by it
         image_pred = image_pred[(-score).argsort()]
         class_confs, class_preds = image_pred[:, 5:].max(1, keepdim=True)
+        #print(class_confs)
         detections = torch.cat((image_pred[:, :5], class_confs.float(), class_preds.float()), 1)
         # Perform non-maximum suppression
         keep_boxes = []
